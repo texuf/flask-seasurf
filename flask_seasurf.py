@@ -253,9 +253,9 @@ class SeaSurf(object):
             self.app.logger.debug('g is none')
             return response
 
-        if not getattr(g, '_csrf_used', False):
-            self.app.logger.debug('g is used')
-            return response
+        #if not getattr(g, '_csrf_used', False):
+        #    self.app.logger.debug('g is used')
+        #    return response
 
         response.set_cookie(self._csrf_name,
                             getattr(g, self._csrf_name),
