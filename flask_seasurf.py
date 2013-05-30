@@ -185,12 +185,17 @@ class SeaSurf(object):
 
         if self._csrf_disable:
             return  # don't validate for testing
+        self.app.logger.debug('!!!!!!!!!!!!!!!!!!_before_request!!!!!!!!!!!!!!!!')
+        self.app.logger.debug("request.cookies")
+        for key in request.cookies:
+            self.app.logger.debug('cookie: (%s): %s ' % (key, request.cookies.get(key,'None')))
 
         csrf_token = request.cookies.get(self._csrf_name, None)
         if not csrf_token:
             setattr(g, self._csrf_name, self._generate_token())
         else:
             setattr(g, self._csrf_name, csrf_token)
+
 
         if request.method not in ('GET', 'HEAD', 'OPTIONS', 'TRACE'):
             # Retrieve the view function based on the request endpoint and
@@ -239,11 +244,17 @@ class SeaSurf(object):
         the response with a cookie containing the token. If not then we just
         return the response unaltered. Bound to the Flask `after_request`
         decorator.'''
+        self.app.logger.debug('!!!!!!!!!!!!!!!!!!_after_request!!!!!!!!!!!!!!!!')
+        gattrs = [x for x in dir(g) if not x.startswith('__') and not callable(getattr(g,x))]
+        for key in gattrs:
+            self.app.logger.debug('(%s) %s' % (str(key), str(getattr(g, key, 'None'))))
 
         if getattr(g, self._csrf_name, None) is None:
+            self.app.logger.debug('g is none')
             return response
 
         if not getattr(g, '_csrf_used', False):
+            self.app.logger.debug('g is used')
             return response
 
         response.set_cookie(self._csrf_name,
@@ -256,6 +267,8 @@ class SeaSurf(object):
         '''Attempts to get a token from the request cookies and sets
         `_csrf_used` to True.'''
         g._csrf_used = True
+        self.app.logger.debug('!!!!!!!!!!!!!!!!!!_get_token!!!!!!!!!!!!!!!!')
+        self.app.logger.debug('get token: %s '% getattr(g, self._csrf_name, 'None'))
         return getattr(g, self._csrf_name, None)
 
     def _generate_token(self):
