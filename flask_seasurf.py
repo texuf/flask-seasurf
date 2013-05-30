@@ -230,8 +230,8 @@ class SeaSurf(object):
                 request_csrf_token = request.headers.get(self._csrf_header_name, '')
 
             if not _constant_time_compare(request_csrf_token, csrf_token):
-                error = (REASON_BAD_TOKEN, request.path)
-                self.app.logger.warning('Forbidden (%s): %s' % error)
+                error = (REASON_BAD_TOKEN, request.path, request_csrf_token, csrf_token, str(_constant_time_compare(request_csrf_token, csrf_token)))
+                self.app.logger.warning('Forbidden (%s): %s \n request_csrf_token %s \n csrf_token: %s \n timeCompare: %s' % error)
                 return abort(403)
 
     def _after_request(self, response):
